@@ -6,13 +6,45 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from .managers import PublishedPostManager
 
+
+class Tag(models.Model):
+    name = models.CharField(unique=True,max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'tag'
+
+
+class DjangoContentType(models.Model):
+    app_label = models.CharField(max_length=255)
+    model = models.CharField(max_length=255)
+
+    class Meta:
+        managed = False
+        db_table = 'django_content_type'
+
+class Taggeditem(models.Model):
+    tag = models.ForeignKey(Tag, models.DO_NOTHING)
+    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING)
+    object_id = models.IntegerField()
+    # content_object=GenericForeignKey('content_type','object_id')
+    class Meta:
+        managed = False
+        db_table = 'taggeditem'
+        # indexes=[models.Index(fields=['tag','content_type','object_id'])]
+
+    def __str__(self):
+        return f"{self.tag.name} tagged to {self.content_object}"
+
+
 class AuthUser(models.Model):
-    username = models.CharField(unique=True)
-    email = models.CharField()
-    password = models.CharField()
+    username = models.CharField(unique=True,max_length=255)
+    email = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
 
     class Meta:
         managed = False
@@ -20,7 +52,7 @@ class AuthUser(models.Model):
 
 
 class Author(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=255)
 
     class Meta:
         managed = False
@@ -28,7 +60,7 @@ class Author(models.Model):
 
 
 class Book(models.Model):
-    title = models.CharField()
+    title = models.CharField(max_length=255)
     author = models.ForeignKey(Author, models.DO_NOTHING)
 
     class Meta:
@@ -37,33 +69,27 @@ class Book(models.Model):
 
 
 class Company(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=255)
 
     class Meta:
         managed = False
         db_table = 'company'
 
 
-class DjangoContentType(models.Model):
-    app_label = models.CharField()
-    model = models.CharField()
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-
-
 class Employee(models.Model):
-    name = models.CharField()
+    name = models.CharField(max_length=255)
     company = models.ForeignKey(Company, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'employee'
+    
+    def __str__(self):
+        return self.name
 
 
 class Photo(models.Model):
-    file_path = models.CharField()
+    file_path = models.CharField(max_length=255)
 
     class Meta:
         managed = False
@@ -71,7 +97,7 @@ class Photo(models.Model):
 
 
 class Post(models.Model):
-    title = models.CharField()
+    title = models.CharField(max_length=255)
     is_published = models.BooleanField()
 
     published=PublishedPostManager()
@@ -106,26 +132,9 @@ class Survey(models.Model):
         db_table = 'survey'
 
 
-class Tag(models.Model):
-    name = models.CharField(unique=True)
-
-    class Meta:
-        managed = False
-        db_table = 'tag'
-
-
-class Taggeditem(models.Model):
-    tag = models.ForeignKey(Tag, models.DO_NOTHING)
-    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING)
-    object_id = models.IntegerField()
-
-    class Meta:
-        managed = False
-        db_table = 'taggeditem'
-
 
 class Tenant(models.Model):
-    schema_name = models.CharField(unique=True)
+    schema_name = models.CharField(unique=True,max_length=255)
 
     class Meta:
         managed = False

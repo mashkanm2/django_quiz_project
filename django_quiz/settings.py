@@ -25,6 +25,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_quiz.TenantMiddleware.TenantMiddleware',
 ]
 
 ROOT_URLCONF = 'django_quiz.urls'
